@@ -2,7 +2,7 @@
 
 include '../src/connection.php';
 
-$api_key_value = "aAh9INn213j";
+$api_key_value = "REPLACEME";
 
 $api_key = $plot_id = $nitr = $phos = $pota = "";
 

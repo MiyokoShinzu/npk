@@ -39,13 +39,13 @@ if ($uid == 1) {
 }
 
 
-
 $sql_details = array(
-  'user' => 'u616194426_sapalo',
-  'pass' => 'c6ehxV59',
-  'db'   => 'u616194426_agritech',
-  'host' => '153.92.15.29'
+  'user' => 'u148988291_npkuser',
+  'pass' => 'EVALLO21ab.',
+  'db'   => 'u148988291_npk',
+  'host' => 'localhost'
 );
+
 
 require('ssp.class.php');
 
