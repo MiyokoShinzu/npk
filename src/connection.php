@@ -1,9 +1,13 @@
 
 <?php
-$servername = "153.92.15.84";
-$username = "u148988291_npkuser"; // Change username
-$password = "EVALLO21ab."; // Change password
-$dbname = "u148988291_npk"; // Change database name
+$servername = "localhost";   // Change server name if needed
+$username = "root"; // Change username
+$password = ""; // Change password
+$dbname = "npk_db"; // Change database name
+// $servername = "153.92.15.84";
+// $username = "u148988291_npkuser";
+// $password = "EVALLO21ab."; 
+// $dbname = "u148988291_npk"; 
 
 $mysqli = new mysqli($servername, $username, $password, $dbname);
 

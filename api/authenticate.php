@@ -21,12 +21,13 @@ if ($stmt = $mysqli->prepare('SELECT id, password FROM accounts WHERE username =
       $_SESSION['loggedin'] = TRUE;
       $_SESSION['name'] = $_POST['username'];
       $_SESSION['id'] = $id;
+     echo 'Welcome ' . $_SESSION['name'] . '!';
       header('Location: ../home.php');
     } else {
-      header('Location: ../index.php');
+      echo json_encode(['status' => 'error', 'message' => 'Incorrect password!']);
     }
   } else {
-    header('Location: ../index.php');
+    echo json_encode(['status' => 'error', 'message' => 'Username not found!']);
   }
 
 
