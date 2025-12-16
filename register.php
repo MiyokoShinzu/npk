@@ -1,76 +1,153 @@
+<?php
+session_start();
+include 'src/connection.php';
+
+$success_message = '';
+$error_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+	if (
+		empty($_POST['username']) ||
+		empty($_POST['email']) ||
+		empty($_POST['password'])
+	) {
+		$error_message = "All fields are required.";
+	} else {
+
+		$username = trim($_POST['username']);
+		$email    = trim($_POST['email']);
+		$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+		$check = $mysqli->prepare("SELECT id FROM accounts WHERE username = ?");
+		$check->bind_param("s", $username);
+		$check->execute();
+		$check->store_result();
+
+		if ($check->num_rows > 0) {
+			$error_message = "Username already exists.";
+		} else {
+			$stmt = $mysqli->prepare(
+				"INSERT INTO accounts (username, email, password) VALUES (?, ?, ?)"
+			);
+			$stmt->bind_param("sss", $username, $email, $password);
+
+			if ($stmt->execute()) {
+				$success_message = "Registration successful! Redirecting to login...";
+				header("Refresh:2; url=index.php");
+			} else {
+				$error_message = "Registration failed. Please try again.";
+			}
+			$stmt->close();
+		}
+		$check->close();
+	}
+}
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<title>Register</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-		integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-	<link rel="stylesheet" href="assets/css/login.css">
+	<meta charset="UTF-8">
+	<title>Register | SYSTEM</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Bootstrap -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+	<style>
+		body {
+			min-height: 100vh;
+			background:
+				linear-gradient(rgba(4, 142, 80, 0.85),
+					rgba(25, 135, 84, 0.85)),
+				url("assets/bg-farm.jpg");
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+		}
+
+		.register-card {
+			border-radius: 18px;
+			box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+			background: rgba(255, 255, 255, 0.96);
+			backdrop-filter: blur(6px);
+		}
+
+		.form-control {
+			border-radius: 8px;
+		}
+
+		.btn-primary {
+			border-radius: 8px;
+			padding: 12px;
+		}
+	</style>
 </head>
 
 <body>
-	<section class="vh-100" style="background-color: #eee;">
-		<div class="container h-100">
-			<div class="row d-flex justify-content-center align-items-center h-100">
-				<div class="col-lg-12 col-xl-11">
-					<div class="card text-black" style="border-radius: 25px;">
-						<div class="card-body p-md-5">
-							<div class="row justify-content-center">
-								<div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
 
-									<p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
+	<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+		<div class="row w-100 justify-content-center">
 
-									<form class="mx-1 mx-md-4" action="./api/register.php" method="get" autocomplete="off">
-										<div class="d-flex flex-row align-items-center mb-4">
-											<i class="fas fa-user fa-lg me-3 fa-fw"></i>
-											<div data-mdb-input-init class="form-outline flex-fill mb-0">
-												<input type="text" name="username" id="username" class="form-control" />
-												<label class="form-label" for="username">
-												    
-												    Username</label>
-											</div>
-										</div>
+			<!-- CENTERED CARD -->
+			<div class="col-md-8 col-lg-6 col-xl-5">
+				<div class="card register-card p-5">
 
-										<div class="d-flex flex-row align-items-center mb-4">
-											<i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-											<div data-mdb-input-init class="form-outline flex-fill mb-0">
-												<input type="email" name="email" id="email" class="form-control" required />
-												<label class="form-label" for="email">Email</label>
-											</div>
-										</div>
+					<h2 class="fw-bold text-center mb-3">Create Account</h2>
+					<p class="text-muted text-center mb-4">
+						Register to access the System
+					</p>
 
-										<div class="d-flex flex-row align-items-center mb-4">
-											<i class="fas fa-lock fa-lg me-3 fa-fw"></i>
-											<div data-mdb-input-init class="form-outline flex-fill mb-0">
-												<input type="password" name="password1" id="password1" class="form-control" required />
-												<label class="form-label" for="password1">Password</label>
-											</div>
-										</div>
-
-									
-
-										<div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-											<button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg">Register</button>
-										</div>
-									</form>
-
-								</div>
-								<div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
-
-									<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
-										class="img-fluid" alt="Sample image">
-
-								</div>
-							</div>
+					<!-- ALERTS -->
+					<?php if ($success_message): ?>
+						<div class="alert alert-success text-center">
+							<?= htmlspecialchars($success_message) ?>
 						</div>
-					</div>
+					<?php elseif ($error_message): ?>
+						<div class="alert alert-danger text-center">
+							<?= htmlspecialchars($error_message) ?>
+						</div>
+					<?php endif; ?>
+
+					<form method="post" autocomplete="off">
+
+						<div class="mb-3">
+							<label class="form-label fw-semibold">Username</label>
+							<input type="text" name="username" class="form-control form-control-lg" required>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label fw-semibold">Email</label>
+							<input type="email" name="email" class="form-control form-control-lg" required>
+						</div>
+
+						<div class="mb-4">
+							<label class="form-label fw-semibold">Password</label>
+							<input type="password" name="password" class="form-control form-control-lg" required>
+						</div>
+
+						<div class="d-grid">
+							<button class="btn btn-primary btn-lg">
+								Register
+							</button>
+						</div>
+
+						<p class="text-center small mt-3">
+							Already have an account?
+							<a href="index.php" class="fw-semibold text-decoration-none">
+								Login
+							</a>
+						</p>
+
+					</form>
+
 				</div>
 			</div>
+
 		</div>
-	</section>
+	</div>
+
 </body>
-
-
 
 </html>
